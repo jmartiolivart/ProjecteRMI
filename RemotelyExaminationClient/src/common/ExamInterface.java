@@ -9,6 +9,4 @@ public interface ExamInterface extends Remote {
     public void enterClass(StudentInterface student) throws RemoteException;
     public void notifyStart() throws RemoteException;
 
-
-
 }

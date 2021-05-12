@@ -1,7 +1,6 @@
 package client;
 
-import common.Exam;
-import common.Student;
+import common.ExamInterface;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,16 +24,19 @@ public class Client {
             String name = reader.readLine();
             System.out.println("Enter your ID card:");
             String id = reader.readLine();
-            Student student = new Student(name, id);
+            StudentImplementation student = new StudentImplementation(name, id);
             System.out.println(student.toString());
 
             //START CONNECTION
             Registry registry = LocateRegistry.getRegistry(host);
-            Exam exam = (Exam) registry.lookup("Exam");
+            ExamInterface exam = (ExamInterface) registry.lookup("Exam");
             exam.enterClass(student);
             System.out.println("Has entrat a classe, esperant a que el professor comensi el examen");
             synchronized (student){
                 student.wait();
+                System.out.println("COMENSA L'EXAMEN!!!");
+                student.wait();
+
             }
             //Enter class
             //While professor no diu comensar examen
