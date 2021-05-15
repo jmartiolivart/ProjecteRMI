@@ -14,7 +14,6 @@ public class Server {
 
     //variable to change when start
     public static boolean started = false;
-    public static List<String> examQuestions;
 
 
     private static Registry startRegistry(Integer port) throws RemoteException {
@@ -39,7 +38,7 @@ public class Server {
     public static void main(String[] args) throws IOException {
 
         String pathToCsv = "../exam.csv";
-        examQuestions = saveExam(pathToCsv);
+        Variables.setExamQuestions(saveExam(pathToCsv));
 
         //Semaphore for reading from terminal work while in background
         String start_word = "start";
@@ -67,19 +66,14 @@ public class Server {
                             System.out.println("Començant el examen");
                             exam.notifyStart();
                     }
+
                     List<StudentInterface> students = exam.getStudents();
-                    //FER QUE ENTRIN MES D'UN A LA VEGADA
-                    for (StudentInterface s: students){
-                        //ES QUEDA TRAVAT PERQUE ESPERA RESPOSTA PER CONTINUAR BUCLE
-                        //FUNCIO PER AGAFAR RESPOSTES QUE ES GUARDARAN AL CLIENT
-                        s.sendQuestions(examQuestions);
-                    }
 
                     for (StudentInterface s: students){
-                        mark = checkAnswers(answers);
-                        s.sendMark(mark);
+                        s.sendQuestions(Variables.getExamQuestions());
                     }
-
+                    exam.notifyStart();
+                    exam.wait();
                     exam.wait();
                     //FINISH
                 }
@@ -112,7 +106,7 @@ public class Server {
         int examMark = 0;
 
         for (int i = 0; i < answers.size() - 1; i++){
-            questionAnswer = examQuestions.get(i);
+            questionAnswer = Variables.getExamQuestions().get(i);
             currentAnswer = questionAnswer.substring(questionAnswer.lastIndexOf(";") + 1, questionAnswer.length() - 1);
 
 

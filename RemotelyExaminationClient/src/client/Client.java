@@ -5,6 +5,7 @@ import common.ExamInterface;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -23,8 +24,8 @@ public class Client {
             System.out.println("Enter a valid username:");
             String name = reader.readLine();
             System.out.println("Enter your ID card:");
-            String id = reader.readLine();
-            StudentImplementation student = new StudentImplementation(name, id);
+            int id = Integer.parseInt(reader.readLine());
+            StudentImplementation student = new StudentImplementation(name, id, 0);
             System.out.println(student.toString());
 
             //START CONNECTION
@@ -36,10 +37,14 @@ public class Client {
                 student.wait();
                 System.out.println("COMENSA L'EXAMEN!!!");
                 student.wait();
-
+                student.answerQuestion();
+                exam.checkAnswers(student, student.getAnswers());
+                System.out .println("La nota de l'examen es " + student.getMark());
+                System.exit(0);
             }
-            //Enter class
-            //While professor no diu comensar examen
+        } catch (ConnectException e){
+            System.out.println("No s'ha pogut connectar amb el serividor");
+            System.exit(1);
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -48,5 +53,8 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+
+
 
 }
