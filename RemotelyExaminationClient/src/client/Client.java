@@ -13,20 +13,20 @@ import java.rmi.registry.Registry;
 
 public class Client {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         String host = (args.length < 1)? null: args[0];
 
-        try {
+        //CREATING STUDENT
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Enter a valid username:");
+        String name = reader.readLine();
+        System.out.println("Enter your ID card:");
+        int id = Integer.parseInt(reader.readLine());
+        StudentImplementation student = new StudentImplementation(name, id, 0);
+        System.out.println(student.toString());
 
-            //CREATING STUDENT
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Enter a valid username:");
-            String name = reader.readLine();
-            System.out.println("Enter your ID card:");
-            int id = Integer.parseInt(reader.readLine());
-            StudentImplementation student = new StudentImplementation(name, id, 0);
-            System.out.println(student.toString());
+        try {
 
             //START CONNECTION
             Registry registry = LocateRegistry.getRegistry(host);
@@ -43,13 +43,10 @@ public class Client {
                 System.exit(0);
             }
         } catch (ConnectException e){
-            System.out.println("No s'ha pogut connectar amb el serividor");
+            System.out.println("Ja s'ha acabat el temps donat de fer l'examen o t'has desconectat");
+            System.out .println("La nota de l'examen es " + student.getMark());
             System.exit(1);
-        } catch (RemoteException | NotBoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (RemoteException | NotBoundException | InterruptedException e) {
             e.printStackTrace();
         }
     }

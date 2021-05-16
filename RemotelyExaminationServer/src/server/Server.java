@@ -42,6 +42,7 @@ public class Server {
 
         //Semaphore for reading from terminal work while in background
         String start_word = "start";
+        String end_word = "stop";
 
         ExamImplementation exam = new ExamImplementation();
         Interrupt interrupt = new Interrupt(exam, start_word);
@@ -72,41 +73,39 @@ public class Server {
                     }
 
                     exam.notifyStart();
-                    exam.wait();
 
-                    //Acaba examen
-                    while (true) {
+
+                    interrupt = new Interrupt(exam, end_word);
+                    interrupt.start();
+                    started = false;
+                    while(!started){
                         System.out.println("Indica quan vulguis que l'examen s'acabi fent escribint: \"stop\" ");
-                        Scanner scanner = new Scanner(System.in);
-                        String x = scanner.nextLine();
-                        if (x.equals("stop")) {
-                            for (StudentInterface s: students){
-                                exam.checkAnswers(s, s.getAnswers());
-                            }
-                        }
+                        exam.wait();
+                    }
+                    //FINISH
+                    for (StudentInterface s: students){
+                        exam.checkAnswers(s, s.getAnswers());
                     }
 
-                    //FINISH
+                    //Save marks on a csv file
+                    Map<Integer, Float> marks = exam.getMarks();
+
+                    File file = new File("../marks.csv");
+                    FileWriter myWriter = new FileWriter("../marks.csv");
+                    Set set = marks.entrySet();
+
+                    for (Object o : set) {
+                        Map.Entry mentry = (Map.Entry) o;
+                        myWriter.write("Alumne: " + mentry.getKey() + "     Nota: " + mentry.getValue() + "\n");
+                    }
+                    myWriter.close();
+                    System.exit(0);
                 }
             }
 
         } catch (AlreadyBoundException | InterruptedException e) {
             e.printStackTrace();
         }
-
-        //Save marks on a csv file
-        Map<Integer, Float> marks = exam.getMarks();
-
-        File file = new File("../marks.csv");
-        FileWriter myWriter = new FileWriter("../marks.csv");
-        Set set = marks.entrySet();
-        Iterator iterator = set.iterator();
-
-        while(iterator.hasNext()) {
-            Map.Entry mentry = (Map.Entry)iterator.next();
-            myWriter.write("Alumne: " + mentry.getKey() + "Nota: " + mentry.getValue());
-        }
-        myWriter.close();
 
 
 
@@ -144,7 +143,7 @@ public class Server {
                 //read the key
                 Scanner scanner = new Scanner(System.in);
                 String x = scanner.nextLine();
-                if (x.equals(this.interrupt_key)) {
+                if (x.equals("start")) {
                     //if is the key we expect, change the variable, notify and return(finish thread)
                     synchronized (this.semaphore) {
                         started = true;
@@ -152,6 +151,15 @@ public class Server {
                         return;
                     }
                 }
+
+                if (x.equals("stop")) {
+                    synchronized (this.semaphore) {
+                        started = true;
+                        this.semaphore.notify();
+                        return;
+                    }
+                }
+
             }
         }
     }

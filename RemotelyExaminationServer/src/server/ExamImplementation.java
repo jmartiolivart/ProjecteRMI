@@ -68,6 +68,11 @@ public class ExamImplementation extends UnicastRemoteObject implements ExamInter
             this.marks.put(student.getId(), finalMark);
 
             student.putMark((((float) examMark / (answers.size())) * 10));
+
+            if(answers.size() == Variables.getExamQuestions().size()){
+                studentList.remove(student);
+            }
+
         }
     }
 
