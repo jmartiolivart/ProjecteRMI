@@ -43,11 +43,9 @@ public class Server {
         //Semaphore for reading from terminal work while in background
         String start_word = "start";
 
-        ExamInterface exam = new ExamImplementation();
+        ExamImplementation exam = new ExamImplementation();
         Interrupt interrupt = new Interrupt(exam, start_word);
 
-        List<String> answers = null;
-        float mark;
 
         try {
             startRegistry(null);
@@ -72,15 +70,45 @@ public class Server {
                     for (StudentInterface s: students){
                         s.sendQuestions(Variables.getExamQuestions());
                     }
+
                     exam.notifyStart();
                     exam.wait();
-                    exam.wait();
+
+                    //Acaba examen
+                    while (true) {
+                        System.out.println("Indica quan vulguis que l'examen s'acabi fent escribint: \"stop\" ");
+                        Scanner scanner = new Scanner(System.in);
+                        String x = scanner.nextLine();
+                        if (x.equals("stop")) {
+                            for (StudentInterface s: students){
+                                exam.checkAnswers(s, s.getAnswers());
+                            }
+                        }
+                    }
+
                     //FINISH
                 }
             }
+
         } catch (AlreadyBoundException | InterruptedException e) {
             e.printStackTrace();
         }
+
+        //Save marks on a csv file
+        Map<Integer, Float> marks = exam.getMarks();
+
+        File file = new File("../marks.csv");
+        FileWriter myWriter = new FileWriter("../marks.csv");
+        Set set = marks.entrySet();
+        Iterator iterator = set.iterator();
+
+        while(iterator.hasNext()) {
+            Map.Entry mentry = (Map.Entry)iterator.next();
+            myWriter.write("Alumne: " + mentry.getKey() + "Nota: " + mentry.getValue());
+        }
+        myWriter.close();
+
+
 
     }
 
@@ -98,23 +126,6 @@ public class Server {
         }
 
         return exam;
-    }
-
-    private static float checkAnswers(List<String> answers){
-
-        String questionAnswer, currentAnswer;
-        int examMark = 0;
-
-        for (int i = 0; i < answers.size() - 1; i++){
-            questionAnswer = Variables.getExamQuestions().get(i);
-            currentAnswer = questionAnswer.substring(questionAnswer.lastIndexOf(";") + 1, questionAnswer.length() - 1);
-
-
-            if(currentAnswer.equals(answers.get(i))){
-                examMark++;
-            }
-        }
-       return ((float) examMark/(answers.size()-1)) * 10;
     }
 
     private static class Interrupt extends Thread {

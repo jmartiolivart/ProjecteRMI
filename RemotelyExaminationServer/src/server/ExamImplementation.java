@@ -6,12 +6,13 @@ import common.StudentInterface;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ExamImplementation extends UnicastRemoteObject implements ExamInterface {
 
-    List<StudentInterface> studentList = new ArrayList<StudentInterface>();
+    List<StudentInterface> studentList = new ArrayList<>();
     boolean started = false;
     Map<Integer,Float> marks;
 
@@ -19,8 +20,7 @@ public class ExamImplementation extends UnicastRemoteObject implements ExamInter
         super();
     }
 
-    @Override
-    public int getNumStudents() throws RemoteException {
+    public int getNumStudents(){
         if (studentList == null){
             return 0;
         }
@@ -38,18 +38,14 @@ public class ExamImplementation extends UnicastRemoteObject implements ExamInter
         }
     }
 
-    @Override
     public void notifyStart() throws RemoteException {
         //Classe ja ha comensat ningu més es pot unir
         started = true;
+        marks = new HashMap<>();
 
         for( StudentInterface student: studentList){
             student.notifyStart();
         }
-    }
-
-    public List<StudentInterface> getStudents(){
-        return studentList;
     }
 
     @Override
@@ -58,7 +54,7 @@ public class ExamImplementation extends UnicastRemoteObject implements ExamInter
             String questionAnswer, currentAnswer;
             int examMark = 0;
 
-            for (int i = 0; i < answers.size() - 1; i++) {
+            for (int i = 0; i < answers.size(); i++) {
                 questionAnswer = Variables.getExamQuestions().get(i);
                 currentAnswer = questionAnswer.substring(questionAnswer.lastIndexOf(";") + 1, questionAnswer.length() - 1);
 
@@ -68,10 +64,20 @@ public class ExamImplementation extends UnicastRemoteObject implements ExamInter
                 }
             }
             //Guardo al professor/servidor totes les notes
-            //float finalMark = (((float) examMark / (answers.size() - 1)) * 10);
-            //marks.put(student.getId(), finalMark);
+            float finalMark = (((float) examMark / (answers.size())) * 10);
+            this.marks.put(student.getId(), finalMark);
 
-            student.putMark((((float) examMark / (answers.size() - 1)) * 10));
+            student.putMark((((float) examMark / (answers.size())) * 10));
         }
     }
+
+    public List<StudentInterface> getStudents(){
+        return studentList;
+    }
+
+
+    public Map<Integer, Float> getMarks() {
+        return marks;
+    }
+
 }

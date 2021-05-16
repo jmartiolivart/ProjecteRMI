@@ -23,10 +23,10 @@ public class StudentImplementation extends UnicastRemoteObject implements Studen
     public static List<String> examQuestions;
 
 
-    public StudentImplementation( String name, int id, float mark) throws RemoteException {
+    public StudentImplementation(String name, int id, float mark) throws RemoteException {
         super();
-        this.id = id;
         this.name = name;
+        this.id = id;
         this.mark = mark;
     }
 
@@ -56,13 +56,9 @@ public class StudentImplementation extends UnicastRemoteObject implements Studen
         StudentImplementation.examQuestions = examQuestions;
     }
 
-    @Override
-    public void sendMark(float mark) throws RemoteException {
-        System.out.println("La nota del examen fet es: " + mark);
-    }
 
     @Override
-    public List<String> getAnswers() throws RemoteException {
+    public List<String> getAnswers() throws RemoteException{
         return this.answers;
 
     }
@@ -72,8 +68,7 @@ public class StudentImplementation extends UnicastRemoteObject implements Studen
         this.mark = mark;
     }
 
-    @Override
-    public float getMark() throws RemoteException {
+    public float getMark(){
         return this.mark;
     }
 
