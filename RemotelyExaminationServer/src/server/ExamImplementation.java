@@ -66,8 +66,7 @@ public class ExamImplementation extends UnicastRemoteObject implements ExamInter
             //Guardo al professor/servidor totes les notes
             float finalMark = (((float) examMark / (answers.size())) * 10);
             this.marks.put(student.getId(), finalMark);
-
-            student.putMark((((float) examMark / (answers.size())) * 10));
+            student.putMark(finalMark);
 
             if(answers.size() == Variables.getExamQuestions().size()){
                 studentList.remove(student);

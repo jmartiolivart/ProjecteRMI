@@ -45,7 +45,7 @@ public class StudentImplementation extends UnicastRemoteObject implements Studen
 
     @Override
     public void notifyExamStarted() throws RemoteException {
-        System.out.println("Ho sentim, l'examen ja ha comensat contacta amb el tutor per" +
+        System.out.println("Ho sentim, l'examen ja ha comensat contacta amb el tutor per " +
                 "veure les alternatives\n");
         exit(0);
 
