@@ -85,7 +85,13 @@ public class StudentImplementation extends UnicastRemoteObject implements Studen
         try {
             for (int i = 0; i < examQuestions.size(); i++){
                 line = examQuestions.get(i);
-                System.out.println(line.substring(0, line.lastIndexOf(";")));
+                line = line.substring(0, line.lastIndexOf(";"));
+                String[] parts = line.split(";");
+                System.out.println(parts[0]);
+                for (int j = 1; j < parts.length; j++){
+                    System.out.println(j + ". " + parts[j]);
+                }
+                System.out.println("Escriu el numero de la resposta que creguis correcta:");
                 answers.add(reader.readLine());
                 this.answers = answers; //Guardo per si el client/estudiant es desconectes
             }
